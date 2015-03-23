@@ -46,6 +46,43 @@ stdstring AstroObj::getCategoryName() {
 
 
 
+
+
+
+//=================================================================
+//               <Star>                        //
+//--------------------------------------------------//
+
+void Star::enterIntoDatabase(SQLite::Database *data) {
+    stdstring SysName   = Sys->getName();
+    stdstring Mass      = std::to_string(dMass);
+    stdstring Age       = std::to_string(dAge);
+    stdstring Lifetime  = std::to_string(dLifetime);
+    stdstring EcoRad    = std::to_string(dEcosphereRadius);
+    
+    stdstring c = " , ";
+    
+    stdstring command =
+    "INSERT INTO Stars (SysName,Mass,Age,Lifetime,EcosphereRadius)"
+    "   values ("+
+    SysName+c+Mass+c+Age+c+Lifetime+c+EcoRad+");";
+    
+    data->exec(command);
+}
+
+//--------------------------------------------------//
+//              </Star>                        //
+//==================================================================
+
+
+
+
+
+
+
+
+
+
 //=================================================================
 //               <Planetary>                        //
 //--------------------------------------------------//
@@ -201,6 +238,10 @@ void System::setName(const stdstring& name) {
     Name = name;
 }
 
+stdstring System::getName() {
+    return Name;
+}
+
 void System::addStar(Star &sun) {
     Stars.push_back(sun);
 }
@@ -307,6 +348,30 @@ cartvec3 System::getLocation() {
     return loc;
 }
 
+void System::enterIntoDatabase(SQLite::Database *data) {
+    stdstring NStars = std::to_string(getNStars());
+    stdstring NPlanets = std::to_string(getNPlanetaries());
+    stdstring PositionX = std::to_string(loc.at(0));
+    stdstring PositionY = std::to_string(loc.at(1));
+    stdstring PositionZ = std::to_string(loc.at(2));
+    
+    stdstring c = " , ";
+    
+    stdstring command =
+    "INSERT INTO Systems (Name, NStars, NPlanets,"
+    "PositionX, PositionY, PositionZ) values ("
+    +Name+c+NStars+c+NPlanets+c+PositionX+c
+    +PositionY+c+PositionZ+");";
+    
+    data->exec(command);
+}
+
+void System::addStarsToDatabase(SQLite::Database *data) {
+    for (int i=0; i<Stars.size(); i++) {
+        Stars.at(i).enterIntoDatabase(data);
+    }
+}
+
 //--------------------------------------------------//
 //              </System>                        //
 //==================================================================
@@ -355,6 +420,59 @@ System* Sector::getSystemWithIndex(int i) {
 
 System* Sector::getLastSystemAdded() {
     return &Systems.back();
+}
+
+void Sector::addSystemsToDatabase(SQLite::Database *data) {
+    SQLite::Transaction trans(*data);
+    
+    stdstring command =
+    "CREATE TABLE IF NOT EXISTS Systems ("
+    "    Name text,"
+    "    NStars int,"
+    "    NPlanets int,"
+    "    PositionX real,"
+    "    PositionY real,"
+    "    PositionZ real"
+    ");";
+    
+    data->exec(command);
+    
+    for (int i=0; i<Systems.size(); i++) {
+        Systems.at(i).enterIntoDatabase(data);
+    }
+    
+    trans.commit();
+}
+
+stdstring Sector::getPlanetInitString() {
+    stdstring o = "( "
+    "   SysName text,"
+    "   Mass real,"
+    "   EquitorialRadius real,"
+    "   PeriodRotational real,"
+    "   
+    
+}
+
+void Sector::addStarsToDatabase(SQLite::Database *data) {
+    SQLite::Transaction trans(*data);
+    
+    stdstring command =
+    "CREATE TABLE IF NOT EXISTS Stars ("
+    "   SysName text,"
+    "   Mass real,"
+    "   Age real,"
+    "   Lifetime real,"
+    "   EcosphereRadius real"
+    ");";
+    
+    data->exec(command);
+    
+    for (int i=0; i<Systems.size(); i++) {
+        Systems.at(i).addStarsToDatabase(data);
+    }
+    
+    trans.commit();
 }
 
 //--------------------------------------------------//

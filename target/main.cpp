@@ -12,10 +12,33 @@
 #include "Utilities.h"
 #include "AstroProcedural.h"
 
+#include "SQLiteCpp/SQLiteCpp.h"
+
 using namespace std;
 
 int main() {
     
+    double size = 20.;
+    double density = 1./284.;
+    
+    const stdstring data_dir = "/Users/ExpandingMan/Mizar5/data/";
+    
+    AstroGen Gen(999);
+    
+    Sector_ptr Sec(Gen.genSectorOfDensityNew(density,size));
+
+    SQLite::Database db(data_dir+"test.db3",SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE);
+    
+    Sec->addSystemsToDatabase(&db);
+    Sec->addStarsToDatabase(&db);
+    
+    return 0;
+}
+
+
+/*
+int main() {
+ 
     double size = 20.;
     double density = 1./284.;
     
@@ -31,3 +54,4 @@ int main() {
     
     return 0;
 }
+*/

@@ -8,10 +8,11 @@
 #ifndef __Mizar5__Utils__
 #define __Mizar5__Utils__
 
-
 #include <vector>
 #include <string>
 #include <cmath>
+#include <sqlite3.h>
+#include "SQLiteCpp/SQLiteCpp.h"
 #include "boost/random.hpp"
 
 #define PI acos(-1.)
@@ -122,7 +123,10 @@ public:
 //--------------------------------------------
 
 
-
+//-----------------------------------------------
+//typedef for SQLite database pointer
+//,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+typedef std::unique_ptr<SQLite::Database> Database_ptr;
 
 
 

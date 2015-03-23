@@ -98,6 +98,9 @@ public:
     double dLifetime;
     double dEcosphereRadius;
     
+    //SQL stuff
+    void enterIntoDatabase(SQLite::Database* data);
+    
 };
 //--------------------------------------------
 
@@ -181,6 +184,9 @@ public:
     double getOrbitPhase();         //units not decided on yet!!!
     double getDistanceFromPrimary();
     cartvec3 getLocation();
+    
+    //SQL Stuff
+    void enterIntoDatabase(SQLite::Database* data);
 };
 //---------------------------------------------
 
@@ -219,6 +225,7 @@ public:
     System& operator=(System&& other);      //move ass operator
     
     void setName(const stdstring& name);
+    stdstring getName();
     
     void addStar(Star& sun);
     void addStarDestr(Star* sun);
@@ -247,6 +254,12 @@ public:
     cartvec3 getLocation();
     
     double getTime() {return -999.;};           //NOT IMPLEMENTED YET!
+    
+    
+    //SQL stuff
+    void enterIntoDatabase(SQLite::Database* data);
+    void addStarsToDatabase(SQLite::Database* data);
+    void addPlanetsToDatabase(SQLite::Database* data);
 };
 //---------------------------------------------
 //typedef for system pointer
@@ -257,6 +270,8 @@ typedef std::unique_ptr<System> System_ptr;
 //Sector===========================================
 //
 //  A rectangular vector of space
+//  For now this class is in charge of setting up
+//  databases.
 //
 //--------------------------------------------
 class Sector {
@@ -270,6 +285,9 @@ private:
     void setSize(double size);              //doesn't rescale systems
                                             //so can only call this when empty
     
+    //SQL Stuff
+    stdstring getPlanetInitString();
+  
 public:
     Sector(double size);
     
@@ -285,6 +303,11 @@ public:
     
     double getTime() {return -999.;};       //not implemented yet!!
     
+    
+    //SQL stuff
+    void addSystemsToDatabase(SQLite::Database* data);      //creates a table with member systems
+    void addStarsToDatabase(SQLite::Database* data);        //creates a table with all stars
+    void addPlanetsToDatabase(SQLite::Database* data);      //creates a table with all planets
 };
 //--------------------------------------------
 //typedef for sector pointer
