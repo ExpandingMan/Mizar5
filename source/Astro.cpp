@@ -8,6 +8,15 @@
 
 #include "Astro.h"
 
+
+
+
+
+
+
+
+
+
 //=================================================================
 //               <AstroObj>                        //
 //--------------------------------------------------//
@@ -105,11 +114,11 @@ void Planetary::setPrimaryStar(const AstroObj &prime) {
     }
 }
 
-AstroObj* Planetary::getPrimaryPlanetary() {
+Planetary* Planetary::getPrimaryPlanetary() {
     return Sys->getPlanetaryWithIndex(iPrimaryIndex);
 }
 
-AstroObj* Planetary::getPrimaryStar() {
+Star* Planetary::getPrimaryStar() {
     return Sys->getStarWithIndex(iPrimaryIndex);
 }
 
@@ -129,10 +138,148 @@ double Planetary::getYPosition() {
     return o;
 }
 
-double Planetary:: getZPosition() {
+double Planetary::getZPosition() {
     double o = sin(getOrbitPhase())*sin(dOrbitInclination);
     o *= getDistanceFromPrimary();
     return o;
+}
+
+stdstring Planetary::getPlanetDBInitString() {
+    stdstring o = "( "
+    "   SysName text,"
+    "   Number int,"
+    "   isMoon int,"
+    "   PrimaryNumber int,"
+    "   Mass real,"
+    "   Type text,"
+    "   EquitorialRadius real,"
+    "   PeriodRotational real,"
+    "   PeriodOrbital real,"
+    "   SemiMajorAxis real,"
+    "   Eccentricity real,"
+    "   Density real,"
+    "   Albedo real,"
+    "   TSurface real,"
+    "   PSurface real,"
+    "   Hydrosphere real,"
+    "   CloudCover real,"
+    "   IceCover real"
+    ")";
+    return o;
+}
+
+stdstring Planetary::convertPlanetTypeToString(PlanetType p) {
+    switch (p) {
+        case (ptUnknown):
+            return "Unkown";
+        case (ptRock):
+            return "Rock";
+        case (ptVenusian):
+            return "Venusian";
+        case (ptTerrestrial):
+            return "Terrestrial";
+        case (ptGasGiant):
+            return "GasGiant";
+        case (ptMartian):
+            return "Martian";
+        case (ptWater):
+            return "Water";
+        case (ptIce):
+            return "Ice";
+        case (ptSubGasGiant):
+            return "SubGasGiant";
+        case (ptSubSubGasGiant):
+            return "SubSubGasGiant";
+        case (ptAsteroid):
+            return "Asteroid";
+        case (pt1Face):
+            return "1Face";
+            
+        default:
+            return "Unknown";
+            break;
+    }
+}
+
+std::vector<stdstring> Planetary::getAttributeNameStrings() {
+    std::vector<stdstring> v;
+    v.push_back("SysName");//1
+    v.push_back("Number");//2
+    v.push_back("isMoon");//3
+    v.push_back("PrimaryNumber");//4           //if 0 then not a moon
+    v.push_back("Mass");//5
+    v.push_back("Type");//6
+    v.push_back("EquitorialRadius");//7
+    v.push_back("PeriodRotational");//8
+    v.push_back("PeriodOrbital");//9
+    v.push_back("SemiMajorAxis");//10
+    v.push_back("Eccentricity");//11
+    v.push_back("Density");//12
+    v.push_back("Albedo");//13
+    v.push_back("TSurface");//14
+    v.push_back("PSurface");//15
+    v.push_back("Hydrosphere");//16
+    v.push_back("CloudCover");//17
+    v.push_back("IceCover");//18
+    return std::move(v);
+}
+
+std::vector<stdstring> Planetary::getAttributeStrings() {
+    std::vector<stdstring> v;
+    v.push_back(Sys->getName());
+    v.push_back(std::to_string(iNumber));
+    if (bMoon) {
+        v.push_back("1");
+        int PNumber = getPrimaryPlanetary()->iNumber;
+        v.push_back(std::to_string(PNumber));
+    } else {
+        v.push_back("0");
+        v.push_back(std::to_string(getPrimaryIndex()));
+    }
+    v.push_back(std::to_string(dMass));
+    stdstring type = convertPlanetTypeToString(Type);
+    type = "'"+type+"'";
+    v.push_back(std::move(type));
+    v.push_back(std::to_string(dEquitorialRadius));
+    v.push_back(std::to_string(dPeriodRotational));
+    v.push_back(std::to_string(dPeriodOrbital));
+    v.push_back(std::to_string(dSemiMajorAxis));
+    v.push_back(std::to_string(dEccentricity));
+    v.push_back(std::to_string(dDensity));
+    v.push_back(std::to_string(dAlbedo));
+    v.push_back(std::to_string(dTSurface));
+    v.push_back(std::to_string(dSurfacePressure));
+    v.push_back(std::to_string(dHydrosphere));
+    v.push_back(std::to_string(dCloudCover));
+    v.push_back(std::to_string(dIceCover));
+    
+    return std::move(v);
+}
+
+void Planetary::feedAttributesToStatement(SQLite::Statement *s) {
+    s->bind(1,Sys->getName());
+    s->bind(2,iNumber);
+    if (bMoon) {
+        s->bind(3,1);
+        s->bind(4,getPrimaryPlanetary()->iNumber);
+    } else {
+        s->bind(3,0);
+        s->bind(4,getPrimaryIndex());
+    }
+    s->bind(5,dMass);
+    s->bind(6,convertPlanetTypeToString(Type));
+    s->bind(7,dEquitorialRadius);
+    s->bind(8,dPeriodRotational);
+    s->bind(9,dPeriodOrbital);
+    s->bind(10,dSemiMajorAxis);
+    s->bind(11,dEccentricity);
+    s->bind(12,dDensity);
+    s->bind(13,dAlbedo);
+    s->bind(14,dTSurface);
+    s->bind(15,dSurfacePressure);
+    s->bind(16,dHydrosphere);
+    s->bind(17,dCloudCover);
+    s->bind(18,dIceCover);
 }
 
 void Planetary::setPrimary(const AstroObj& prime) {
@@ -178,6 +325,31 @@ cartvec3 Planetary::getLocation() {
     return cartvec3(getXPosition(),
                     getYPosition(),
                     getZPosition());
+}
+
+void Planetary::enterIntoDatabase(SQLite::Database *data) {
+
+    stdstring c = " , ";
+    
+    stdstring command = "INSERT INTO Planets (";
+    
+    std::vector<stdstring> NameList = getAttributeNameStrings();
+    for (int i=0; i<NameList.size()-1; i++) {
+        command += NameList.at(i)+c;
+    }
+    command += NameList.back()+") ";
+    
+    command += "VALUES (";
+    
+    for (int i=0; i<NameList.size()-1; i++) {
+        command += "?"+c;
+    }
+    command += "?);";
+    
+    SQLite::Statement statement(*data,command);
+    
+    feedAttributesToStatement(&statement);
+    statement.exec();
 }
 
 //--------------------------------------------------//
@@ -359,7 +531,7 @@ void System::enterIntoDatabase(SQLite::Database *data) {
     
     stdstring command =
     "INSERT INTO Systems (Name, NStars, NPlanets,"
-    "PositionX, PositionY, PositionZ) values ("
+    "PositionX, PositionY, PositionZ) VALUES ("
     +Name+c+NStars+c+NPlanets+c+PositionX+c
     +PositionY+c+PositionZ+");";
     
@@ -369,6 +541,12 @@ void System::enterIntoDatabase(SQLite::Database *data) {
 void System::addStarsToDatabase(SQLite::Database *data) {
     for (int i=0; i<Stars.size(); i++) {
         Stars.at(i).enterIntoDatabase(data);
+    }
+}
+
+void System::addPlanetsToDatabase(SQLite::Database *data) {
+    for (int i=0; i<Planetaries.size(); i++) {
+        Planetaries.at(i).enterIntoDatabase(data);
     }
 }
 
@@ -444,16 +622,6 @@ void Sector::addSystemsToDatabase(SQLite::Database *data) {
     trans.commit();
 }
 
-stdstring Sector::getPlanetInitString() {
-    stdstring o = "( "
-    "   SysName text,"
-    "   Mass real,"
-    "   EquitorialRadius real,"
-    "   PeriodRotational real,"
-    "   
-    
-}
-
 void Sector::addStarsToDatabase(SQLite::Database *data) {
     SQLite::Transaction trans(*data);
     
@@ -470,6 +638,22 @@ void Sector::addStarsToDatabase(SQLite::Database *data) {
     
     for (int i=0; i<Systems.size(); i++) {
         Systems.at(i).addStarsToDatabase(data);
+    }
+    
+    trans.commit();
+}
+
+void Sector::addPlanetsToDatabase(SQLite::Database *data) {
+    SQLite::Transaction trans(*data);
+    
+    stdstring command =
+    "CREATE TABLE IF NOT EXISTS Planets "
+    +Planetary::getPlanetDBInitString()+";";
+    
+    data->exec(command);
+    
+    for (int i=0; i<Systems.size(); i++) {
+        Systems.at(i).addPlanetsToDatabase(data);
     }
     
     trans.commit();

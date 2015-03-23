@@ -41,10 +41,12 @@ enum PlanetType {
     ptIce,
     ptSubGasGiant,
     ptSubSubGasGiant,
-    ptAsteroids,
+    ptAsteroid,
     pt1Face
 };
-//--------------------------------------------
+//------------------------------------------------
+stdstring convertPlanetTypeToString(PlanetType p);
+//------------------------------------------------
 
 
 //forward decs~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,12 +121,20 @@ private:
     void setPrimaryPlanetary(const AstroObj& prime);
     void setPrimaryStar(const AstroObj& prime);
     
-    AstroObj* getPrimaryPlanetary();
-    AstroObj* getPrimaryStar();
+    Planetary* getPrimaryPlanetary();
+    Star* getPrimaryStar();
     
     double getXPosition();
     double getYPosition();
     double getZPosition();
+    
+    //SQL Stuff_______________________________________________
+    static std::vector<stdstring> getAttributeNameStrings();
+    static stdstring convertPlanetTypeToString(PlanetType p);
+    
+    std::vector<stdstring> getAttributeStrings();
+    
+    void feedAttributesToStatement(SQLite::Statement* s);
     
 public:
     
@@ -186,6 +196,7 @@ public:
     cartvec3 getLocation();
     
     //SQL Stuff
+    static stdstring getPlanetDBInitString();
     void enterIntoDatabase(SQLite::Database* data);
 };
 //---------------------------------------------
@@ -284,10 +295,6 @@ private:
     
     void setSize(double size);              //doesn't rescale systems
                                             //so can only call this when empty
-    
-    //SQL Stuff
-    stdstring getPlanetInitString();
-  
 public:
     Sector(double size);
     

@@ -32,6 +32,7 @@ typedef std::string stdstring;
 typedef boost::mt19937 PRNGen;
 
 
+
 //Random=========================================
 //
 //  Random number generator wrapper.
