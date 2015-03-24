@@ -11,13 +11,38 @@
 #include "StarGen/stargen.h"
 #include "Utilities.h"
 #include "AstroProcedural.h"
+#include "Commerce.h"
 
 #include "SQLiteCpp/SQLiteCpp.h"
 
 using namespace std;
 
+int main() {
+    
+    Cargo Rutile(ctRutile,3);
+    Cargo Aluminum(ctAluminum,3);
+    Cargo Bauxite(ctBauxite,3);
+    Cargo Gold(ctGold,3);
+    
+    CargoBay Bay1(10);
+    
+    CargoBay Bay2(8);
+    
+    Bay1.addCargo(Rutile);
+    
+    Bay1.addCargo(Aluminum);
+    
+    Bay1.addCargo(Bauxite);
+    
+    Bay1.addCargo(Gold);
+    
+    Bay2.transferAllCargoFrom(Bay1);
+    
+    return 0;
+}
 
 
+/*
 int main() {
     
     double size = 20.;
@@ -37,7 +62,7 @@ int main() {
     
     return 0;
 }
-
+*/
 /*
  //AN ARCHETYPE OF HOW TO DO SQL SHIT
  int main() {

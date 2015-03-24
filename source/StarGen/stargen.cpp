@@ -1972,8 +1972,8 @@ int stargen (actions		action,
 
 #define AU_TO_LIGHTSECONDS 499.
 #define SOL_TO_EARTH_MASS  332948.6
-#define HOUR_TO_DAY 24.
-#define DAY_TO_YEAR 365.25
+#define HOUR_TO_DAY 1./24.
+#define DAY_TO_YEAR 1./365.25
 #define GRAMpCM3_TO_KGpM3 1000.
 #define CM_TO_M 0.01
 
