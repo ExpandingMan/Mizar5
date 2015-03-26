@@ -54,12 +54,28 @@ class Planetary;//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class System;//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class Sector;//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+//NavObj===========================================
+//
+//  Virtual base class for objects at which
+//  nav points can be set.
+//
+//--------------------------------------------
+class NavObj {
+    //stuff goes here
+};
+//----------------------------------------------
+
+
+
+
+
 //AstroObj===========================================
 //
 //  Virtual base class for astrophysical objects.
 //
 //--------------------------------------------
-class AstroObj {
+class AstroObj : public NavObj {
     
 protected:
     
@@ -107,6 +123,9 @@ public:
 //--------------------------------------------
 
 
+//forward decs~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class City;//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 //Planetary===========================================
 //
@@ -137,6 +156,9 @@ private:
     void feedAttributesToStatement(SQLite::Statement* s);
     
 public:
+    
+    //CITIES_________________________________________
+    std::vector<City> Cities;
     
     //DATA____________________________________________
     PlanetType Type;            

@@ -38,7 +38,7 @@ int main() {
     
     Bay2.transferAllCargoFrom(Bay1);
     
-    return 0;
+    return 0; 
 }
 
 

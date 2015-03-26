@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Utilities.h"
+#include "Astro.h"
 
 //===========================================
 //
@@ -116,8 +117,8 @@ public:
     bool roomFor(Cargo C);
     
     void transferCargoTo(CommodityTypes type,
-                       int amount,
-                       CargoBay& other);
+                         int amount,
+                         CargoBay& other);
     
     void transferCargoTo(Cargo C, CargoBay& other);
     
@@ -132,6 +133,160 @@ public:
     
 };
 //--------------------------------------------
+
+
+//Facility===========================================
+//
+//  Virtual base class for facilities.
+//
+//--------------------------------------------
+class Facility {
+private:
+    stdstring TypeName;
+    
+public:
+
+    CargoBay Input;
+    CargoBay Output;
+    
+    stdstring getTypeName();
+};
+//--------------------------------------------
+
+
+
+//IndustrialCenter===========================================
+//
+//  Base class for industrial centers
+//
+//--------------------------------------------
+class IndustrialCenter {
+    
+private:
+    std::vector<Facility> Facilities;
+    
+    //FACILITY_MANAGEMENT__________________________
+    void addFacility(Facility f);
+    void removeFacility(int i);
+    
+    Facility* getFacility(int i);
+};
+
+
+//Ship===========================================
+//
+//  Base class for ships.
+//
+//--------------------------------------------
+class Ship {
+    
+private:
+    NavObj* Location;
+    NavObj* Destination;
+    
+public:
+    
+    void setDestination(NavObj* dest);
+    
+};
+typedef std::shared_ptr<Ship> Ship_ptr;
+//--------------------------------------------
+
+
+//SmallFreighter===========================================
+//
+//  a small freighter
+//
+//--------------------------------------------
+class SmallFreighter {
+    
+private:
+    
+public:
+    SmallFreighter();
+    
+    CargoBay Bay1;
+};
+//--------------------------------------------
+
+
+//LargeFreighter===========================================
+//
+//  a large freighter
+//
+//--------------------------------------------
+class LargeFreighter {
+    
+private:
+    
+public:
+    LargeFreighter();
+    
+    CargoBay Bay1;
+};
+//---------------------------------------------
+
+
+
+//City===========================================
+//
+//  A city or settlement on a planet.
+//
+//--------------------------------------------
+class City : public IndustrialCenter {
+    
+private:
+    int Population;
+    
+public:
+    
+    City(int pop);          //for now this will be static
+};
+
+
+
+
+//Station===========================================
+//
+//  A space station.
+//
+//--------------------------------------------
+class Station : public NavObj, public IndustrialCenter {
+
+private:
+    AstroObj* Primary;
+    
+    std::vector<Ship_ptr> Hangar;      //may eventually be replaced by a class
+    
+public:
+    Station(AstroObj* primary);
+    
+    CargoBay PublicBay;             //for now this has maximum capacity.
+    
+    
+    //HANGAR_MANAGEMENT____________________________
+    bool checkIfDocked(Ship_ptr s);
+    
+    void dock(Ship_ptr s);
+    void undock(int i);
+    void undock(Ship_ptr s);
+    
+};
+//--------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
